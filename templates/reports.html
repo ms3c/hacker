@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Reports & Analytics</h1>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total Members</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ gender_data|length }}</div>
+        <div class="stat-label">Gender Categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ district_data|length }}</div>
+        <div class="stat-label">Districts Covered</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ disability_data|length }}</div>
+        <div class="stat-label">Disability Types</div>
+    </div>
+</div>
+
+<div class="chart-grid">
+    <div class="chart-card">
+        <h3 class="chart-title">Gender Distribution</h3>
+        <canvas id="genderChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3 class="chart-title">Age Groups</h3>
+        <canvas id="ageChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3 class="chart-title">Disability Types</h3>
+        <canvas id="disabilityChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3 class="chart-title">Payment Methods</h3>
+        <canvas id="paymentChart"></canvas>
+    </div>
+</div>
+
+{% if district_data %}
+<div class="card" style="margin-top: 1.5rem;">
+    <h3 class="chart-title">Members by District</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>District</th>
+                    <th>Members</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in district_data %}
+                <tr>
+                    <td><strong>{{ d['District'] or 'Unknown' }}</strong></td>
+                    <td>{{ d['count'] }}</td>
+                    <td>{{ '%.1f'|format(d['count'] / total * 100 if total else 0) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<script>
+const chartColors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = 'rgba(0,0,0,0.08)';
+
+// Gender Chart
+new Chart(document.getElementById('genderChart'), {
+    type: 'doughnut',
+    data: {
+        labels: [{% for g in gender_data %}'{{ g["Gender"] or "Unknown" }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for g in gender_data %}{{ g['count'] }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: chartColors,
+            borderWidth: 0
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+// Age Chart
+new Chart(document.getElementById('ageChart'), {
+    type: 'bar',
+    data: {
+        labels: [{% for a in age_data %}'{{ a["AgeGroup"] }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Members',
+            data: [{% for a in age_data %}{{ a['count'] }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: '#2563eb',
+            borderRadius: 8
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+// Disability Chart
+new Chart(document.getElementById('disabilityChart'), {
+    type: 'pie',
+    data: {
+        labels: [{% for d in disability_data %}'{{ d["Disability"] or "Unknown" }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for d in disability_data %}{{ d['count'] }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: chartColors,
+            borderWidth: 0
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+// Payment Chart
+new Chart(document.getElementById('paymentChart'), {
+    type: 'doughnut',
+    data: {
+        labels: [{% for p in payment_data %}'{{ p["PaymentMethod"] or "Unknown" }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for p in payment_data %}{{ p['count'] }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: chartColors.slice().reverse(),
+            borderWidth: 0
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}
+
