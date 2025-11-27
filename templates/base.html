@@ -290,6 +290,40 @@
             gap: 8px;
         }
         
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .filter-card {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -302,18 +336,146 @@
             color: var(--text-primary);
         }
         
+        /* Mobile First - Base styles are for mobile */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
-                position: relative;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                left: 0;
                 flex-direction: row;
-                padding: 1rem;
-                overflow-x: auto;
+                padding: 0.5rem 1rem;
+                justify-content: space-around;
+                border-right: none;
+                border-top: 1px solid var(--border);
+                z-index: 1000;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
             }
-            .logo { margin-bottom: 0; margin-right: 2rem; }
-            .main-content { margin-left: 0; padding: 1.5rem; }
-            .nav-link { margin-bottom: 0; margin-right: 8px; white-space: nowrap; }
+            .logo { display: none; }
+            .main-content { 
+                margin-left: 0; 
+                padding: 1rem;
+                padding-bottom: 80px;
+            }
+            .nav-link { 
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px 12px;
+                margin: 0;
+                font-size: 0.75rem;
+                border-radius: 8px;
+            }
+            .nav-icon { width: 22px; height: 22px; }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .page-title { font-size: 1.5rem; }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+                justify-content: center;
+            }
+            .btn-sm { 
+                padding: 8px 12px; 
+                font-size: 0.8rem;
+            }
+            
+            .header-actions {
+                display: flex;
+                gap: 8px;
+                width: 100%;
+            }
+            .header-actions .btn {
+                flex: 1;
+            }
+            
+            .filter-form {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .filter-actions {
+                width: 100%;
+            }
+            .filter-actions .btn {
+                flex: 1;
+            }
+            
+            .card { 
+                padding: 1rem; 
+                border-radius: 12px;
+                margin-bottom: 1rem;
+            }
+            
+            th, td { 
+                padding: 10px 8px; 
+                font-size: 0.85rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-control {
+                padding: 14px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            .stat-card { padding: 1rem; }
+            .stat-value { font-size: 1.8rem; }
+            .stat-label { font-size: 0.8rem; }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-card { padding: 1rem; }
+            
+            .flash {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            
+            .empty-state { padding: 2rem 1rem; }
+            
+            /* Hide less important table columns on mobile */
+            table th:nth-child(5),
+            table td:nth-child(5),
+            table th:nth-child(7),
+            table td:nth-child(7),
+            table th:nth-child(8),
+            table td:nth-child(8) {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
+            .page-title { font-size: 1.3rem; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .stat-value { font-size: 1.5rem; }
+            
+            table th:nth-child(4),
+            table td:nth-child(4),
+            table th:nth-child(6),
+            table td:nth-child(6) {
+                display: none;
+            }
         }
     </style>
 </head>

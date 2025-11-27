@@ -22,12 +22,56 @@ def get_lookup_data():
     conn.close()
     return genders, disabilities, payments
 
+def build_filter_query(base_query, params):
+    """Build filtered query based on request args"""
+    conditions = []
+    values = []
+    
+    age_group = params.get('age_group', '')
+    district = params.get('district', '')
+    payment = params.get('payment', '')
+    
+    if age_group:
+        if age_group == 'under18':
+            conditions.append("Age < 18")
+        elif age_group == '18-35':
+            conditions.append("Age BETWEEN 18 AND 35")
+        elif age_group == '36-59':
+            conditions.append("Age BETWEEN 36 AND 59")
+        elif age_group == '60+':
+            conditions.append("Age >= 60")
+    
+    if district:
+        conditions.append("District = ?")
+        values.append(district)
+    
+    if payment:
+        conditions.append("PaymentMethod = ?")
+        values.append(payment)
+    
+    if conditions:
+        base_query += " WHERE " + " AND ".join(conditions)
+    
+    return base_query, values
+
 @app.route('/')
 def index():
     conn = get_db()
-    members = conn.execute("SELECT * FROM Members ORDER BY ID DESC").fetchall()
+    
+    # Get filter options
+    districts = [r['District'] for r in conn.execute("SELECT DISTINCT District FROM Members WHERE District IS NOT NULL AND District != ''").fetchall()]
+    _, _, payments = get_lookup_data()
+    
+    # Build filtered query
+    query, values = build_filter_query("SELECT * FROM Members", request.args)
+    query += " ORDER BY ID DESC"
+    members = conn.execute(query, values).fetchall()
     conn.close()
-    return render_template('index.html', members=members)
+    
+    return render_template('index.html', members=members, districts=districts, payments=payments,
+                          current_age=request.args.get('age_group', ''),
+                          current_district=request.args.get('district', ''),
+                          current_payment=request.args.get('payment', ''))
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_member():
@@ -85,7 +129,11 @@ def delete_member(id):
 @app.route('/export')
 def export_excel():
     conn = get_db()
-    members = conn.execute("SELECT * FROM Members ORDER BY ID").fetchall()
+    
+    # Build filtered query (same filters as index)
+    query, values = build_filter_query("SELECT * FROM Members", request.args)
+    query += " ORDER BY ID"
+    members = conn.execute(query, values).fetchall()
     conn.close()
     
     output = StringIO()
